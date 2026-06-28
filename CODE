@@ -1,0 +1,82 @@
+SKETCH.INO
+#include <DHT.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define DHTPIN 15
+#define DHTTYPE DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+
+Adafruit_SSD1306 display(128,64,&Wire,-1);
+
+void setup() {
+  Serial.begin(115200);
+
+  dht.begin();
+
+  display.begin(SSD1306_SWITCHCAPVCC,0x3C);
+  display.clearDisplay();
+}
+
+void loop() {
+
+  float temp = dht.readTemperature();
+  float hum = dht.readHumidity();
+
+  Serial.print("Temperature: ");
+  Serial.println(temp);
+
+  Serial.print("Humidity: ");
+  Serial.println(hum);
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+
+  display.setCursor(0,10);
+  display.print("Temperature: ");
+  display.print(temp);
+  display.println(" C");
+
+  display.setCursor(0,30);
+  display.print("Humidity: ");
+  display.print(hum);
+  display.println(" %");
+
+  display.display();
+
+DIAGRAM.JSON
+
+{
+  "version": 1,
+  "author": "Krithika.S",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -19.2, "left": -119.96, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -114.9, "left": 100.2, "attrs": {} },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": 79.94,
+      "left": 105.83,
+      "attrs": { "i2cAddress": "0x3c" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v-9.6", "h105.6" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v115.2", "h76.8" ] ],
+    [ "esp:15", "dht1:SDA", "green", [ "v-134.4", "h-192" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-28.8", "h163.35" ] ],
+    [ "oled1:GND", "esp:GND.1", "black", [ "v96", "h172.8" ] ],
+    [ "oled1:SDA", "esp:21", "green", [ "v19.2", "h240.07" ] ],
+    [ "oled1:SCL", "esp:22", "green", [ "v-9.6", "h249.9" ] ]
+  ],
+  "dependencies": {}
+}
+
+  delay(2000);
+}
